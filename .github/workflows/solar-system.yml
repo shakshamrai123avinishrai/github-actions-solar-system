@@ -11,14 +11,21 @@ jobs:
     unit-testing:
         name: Unit Testing
         runs-on: ubuntu-latest
+        container: 
+        image: 'node:20'
         steps:
         - name: Checkout Repository
           uses: actions/checkout@v4
 
-        - name: Setup NodeJS Version
-          uses: actions/setup-node@v4
+        #- name: Setup NodeJS Version
+        #  uses: actions/setup-node@v4
+        #  with:
+        #   node-version: 20
+        - name: Cache NPM dependencies
+          uses: actions/cache@v4
           with:
-            node-version: 20
+           path: ~/.npm
+           key: '${{ runner.os }}-node-modules-${{ hashFiles(''package-lock.json'') }}'
     
         - name: Install Dependencies
           run: npm install
@@ -27,6 +34,7 @@ jobs:
           run: npm test
           
         - name: Archive Test Result
+          if: always()
           uses: actions/upload-artifact@v4
           with:
             name: Mocha-Test-Result
